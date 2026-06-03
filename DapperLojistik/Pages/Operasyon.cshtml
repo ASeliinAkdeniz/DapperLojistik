@@ -1,0 +1,312 @@
+﻿@page
+@model DapperLojistik.Pages.OperasyonModel
+@{
+    ViewData["Title"] = "Operasyon Merkezi";
+    ViewData["ActivePage"] = "Operasyon";
+    var duzenle = Model.DuzenlenecekKargo;
+    bool isDuzenle = duzenle != null;
+}
+
+<style>
+    .form-card { border-radius: 20px !important; }
+    .bolum-baslik {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: .6rem 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+    .bolum-icon {
+        width: 28px; height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .85rem;
+    }
+    .form-control, .form-select {
+        border-radius: 12px !important;
+        border: 1.5px solid #e2e8f0 !important;
+        background: #f8faff !important;
+        font-size: .85rem;
+        padding: .5rem .9rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #4361ee !important;
+        box-shadow: 0 0 0 3px rgba(67,97,238,.1) !important;
+        background: #fff !important;
+    }
+    .form-control[readonly], .form-select[disabled] {
+        background: #f1f5f9 !important;
+        color: #94a3b8;
+    }
+    .form-label {
+        font-size: .78rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: .3rem;
+    }
+    .btn-kaydet {
+        border-radius: 12px !important;
+        padding: .55rem 2rem;
+        font-weight: 600;
+        font-size: .88rem;
+        border: none;
+    }
+    .btn-geri {
+        border-radius: 12px !important;
+        padding: .55rem 1.5rem;
+        font-size: .88rem;
+        border: 1.5px solid #e2e8f0;
+        color: #64748b;
+        background: #f8faff;
+    }
+    .btn-geri:hover { background: #f1f5f9; }
+    .ayirici {
+        border: none;
+        height: 1.5px;
+        background: linear-gradient(to right, #e0e7ff, transparent);
+        margin: .5rem 0 1.2rem;
+    }
+</style>
+
+<!-- Başlık -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">
+            @(isDuzenle ? "Kargo Kaydı Düzenle ✏️" : "Yeni Kargo Ekle 📦")
+        </h4>
+        <p class="text-muted small mb-0">
+            @(isDuzenle ? $"Takip No: {duzenle!.TakipNo}" : "Yeni gönderi kaydı oluşturun")
+        </p>
+    </div>
+    @if (isDuzenle)
+    {
+        <a href="/Operasyon" class="btn btn-sm px-3"
+           style="border-radius:12px;background:#e0e7ff;color:#4361ee;border:none;font-weight:600">
+            <i class="bi bi-plus-circle me-1"></i>Yeni Ekle
+        </a>
+    }
+</div>
+
+<!-- Mesaj -->
+@if (TempData["Mesaj"] != null)
+{
+    <div class="alert alert-dismissible fade show border-0 shadow-sm mb-4"
+         style="border-radius:14px;background:#dcfce7;color:#16a34a" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Mesaj"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Form -->
+<div class="card form-card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="post" asp-page-handler="@(isDuzenle ? "Guncelle" : "Ekle")">
+            @if (isDuzenle)
+            {
+                <input type="hidden" asp-for="Kargo.Id" value="@duzenle!.Id" />
+            }
+
+            <!-- Gönderici -->
+            <div class="bolum-baslik" style="background:#e0e7ff;color:#4361ee">
+                <div class="bolum-icon" style="background:#c7d2fe">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                Gönderici Bilgileri
+            </div>
+            <hr class="ayirci" />
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Gönderici Adı</label>
+                    <input asp-for="Kargo.GondericiAd" class="form-control"
+                           value="@(isDuzenle ? duzenle!.GondericiAd : "")"
+                           placeholder="Ad Soyad"
+                           @@(isDuzenle ? "readonly" : "") required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Telefon</label>
+                    <input asp-for="Kargo.GondericiTelefon" class="form-control"
+                           value="@(isDuzenle ? duzenle!.GondericiTelefon : "")"
+                           placeholder="05XX XXX XX XX"
+                           @@(isDuzenle ? "readonly" : "") required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Şehir</label>
+                    <select asp-for="Kargo.GondericiSehir" class="form-select"
+                            @@(isDuzenle ? "disabled" : "") required>
+                        <option value="">Seçin...</option>
+                        @foreach (var s in OperasyonModel.Sehirler)
+                        {
+                            <option value="@s" selected="@(isDuzenle && duzenle!.GondericiSehir == s)">@s</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Alıcı -->
+            <div class="bolum-baslik" style="background:#dcfce7;color:#16a34a">
+                <div class="bolum-icon" style="background:#bbf7d0">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+                Alıcı Bilgileri
+            </div>
+            <hr class="ayirci" style="background:linear-gradient(to right,#dcfce7,transparent)" />
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Alıcı Adı</label>
+                    <input asp-for="Kargo.AliciAd" class="form-control"
+                           value="@(isDuzenle ? duzenle!.AliciAd : "")"
+                           placeholder="Ad Soyad" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Telefon</label>
+                    <input asp-for="Kargo.AliciTelefon" class="form-control"
+                           value="@(isDuzenle ? duzenle!.AliciTelefon : "")"
+                           placeholder="05XX XXX XX XX" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Şehir</label>
+                    <select asp-for="Kargo.AliciSehir" class="form-select" required>
+                        <option value="">Seçin...</option>
+                        @foreach (var s in OperasyonModel.Sehirler)
+                        {
+                            <option value="@s" selected="@(isDuzenle && duzenle!.AliciSehir == s)">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Adres</label>
+                    <textarea asp-for="Kargo.AliciAdres" class="form-control" rows="2"
+                              placeholder="Mahalle, Sokak, No">@(isDuzenle ? duzenle!.AliciAdres : "")</textarea>
+                </div>
+            </div>
+
+            <!-- Kargo Bilgileri -->
+            <div class="bolum-baslik" style="background:#fef9c3;color:#ca8a04">
+                <div class="bolum-icon" style="background:#fef08a">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                Kargo Bilgileri
+            </div>
+            <hr class="ayirci" style="background:linear-gradient(to right,#fef9c3,transparent)" />
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Kategori</label>
+                    <select asp-for="Kargo.UrunKategorisi" class="form-select"
+                            @@(isDuzenle ? "disabled" : "") required>
+                        <option value="">Seçin...</option>
+                        @foreach (var k in OperasyonModel.Kategoriler)
+                        {
+                            <option value="@k" selected="@(isDuzenle && duzenle!.UrunKategorisi == k)">@k</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ağırlık (kg)</label>
+                    <input asp-for="Kargo.AgirlikKg" type="number" step="0.01" class="form-control"
+                           value="@(isDuzenle ? duzenle!.AgirlikKg : "")"
+                           placeholder="0.00"
+                           @@(isDuzenle ? "readonly" : "") required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Kargo Firması</label>
+                    <select asp-for="Kargo.KargoFirmasi" class="form-select"
+                            @@(isDuzenle ? "disabled" : "") required>
+                        <option value="">Seçin...</option>
+                        @foreach (var f in OperasyonModel.Firmalar)
+                        {
+                            <option value="@f" selected="@(isDuzenle && duzenle!.KargoFirmasi == f)">@f</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Araç Tipi</label>
+                    <select asp-for="Kargo.AracTipi" class="form-select"
+                            @@(isDuzenle ? "disabled" : "") required>
+                        <option value="">Seçin...</option>
+                        @foreach (var a in OperasyonModel.AracTipleri)
+                        {
+                            <option value="@a" selected="@(isDuzenle && duzenle!.AracTipi == a)">@a</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Durum & Ödeme -->
+            <div class="bolum-baslik" style="background:#e0f2fe;color:#0284c7">
+                <div class="bolum-icon" style="background:#bae6fd">
+                    <i class="bi bi-credit-card"></i>
+                </div>
+                Durum & Ödeme
+            </div>
+            <hr class="ayirci" style="background:linear-gradient(to right,#e0f2fe,transparent)" />
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Durum</label>
+                    <select asp-for="Kargo.Durum" class="form-select" required>
+                        <option value="">Seçin...</option>
+                        @foreach (var d in OperasyonModel.Durumlar)
+                        {
+                            <option value="@d" selected="@(isDuzenle && duzenle!.Durum == d)">@d</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ödeme Tutarı (₺)</label>
+                    <input asp-for="Kargo.OdemeTutari" type="number" step="0.01" class="form-control"
+                           value="@(isDuzenle ? duzenle!.OdemeTutari : "")"
+                           placeholder="0.00" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ödeme Yöntemi</label>
+                    <select asp-for="Kargo.OdemeYontemi" class="form-select" required>
+                        <option value="">Seçin...</option>
+                        @foreach (var o in OperasyonModel.OdemeYontemleri)
+                        {
+                            <option value="@o" selected="@(isDuzenle && duzenle!.OdemeYontemi == o)">@o</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Ödendi mi?</label>
+                    <select asp-for="Kargo.OdenmeMi" class="form-select" required>
+                        <option value="">Seçin...</option>
+                        <option value="Evet" selected="@(isDuzenle && duzenle!.OdenmeMi == "Evet")">✅ Evet</option>
+                        <option value="Hayır" selected="@(isDuzenle && duzenle!.OdenmeMi == "Hayır")">❌ Hayır</option>
+                    </select>
+                </div>
+                @if (isDuzenle)
+                {
+                    <div class="col-md-6">
+                        <label class="form-label">Teslim Tarihi</label>
+                        <input asp-for="Kargo.TeslimTarihi" type="datetime-local" class="form-control"
+                               value="@(duzenle!.TeslimTarihi?.ToString("yyyy-MM-ddTHH:mm"))" />
+                    </div>
+                }
+                <div class="col-md-@(isDuzenle ? "6" : "12")">
+                    <label class="form-label">Notlar</label>
+                    <input asp-for="Kargo.Notlar" class="form-control"
+                           value="@(isDuzenle ? duzenle!.Notlar : "")"
+                           placeholder="Kırılabilir, Soğuk Zincir, Acil Teslimat vb." />
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="d-flex gap-2 justify-content-end pt-2"
+                 style="border-top:1.5px solid #f1f5f9">
+                <a href="/KargoListe" class="btn btn-geri">
+                    <i class="bi bi-list-ul me-1"></i>Listeye Dön
+                </a>
+                <button type="submit" class="btn btn-kaydet text-white"
+                        style="background:@(isDuzenle ? "#ca8a04" : "#16a34a")">
+                    <i class="bi bi-@(isDuzenle ? "check-circle" : "plus-circle") me-2"></i>
+                    @(isDuzenle ? "Değişiklikleri Kaydet" : "Kargo Ekle")
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,366 @@
+﻿@page
+@model DapperLojistik.Pages.KargoListeModel
+@{
+    ViewData["Title"] = "Kargo Listesi";
+    ViewData["ActivePage"] = "KargoListe";
+}
+
+<style>
+    .filtre-card {
+        border-radius: 20px !important;
+    }
+
+    .tablo-card {
+        border-radius: 20px !important;
+        overflow: hidden;
+    }
+
+    .page-link {
+        border-radius: 10px !important;
+        margin: 0 2px;
+        border: none;
+        color: #4361ee;
+    }
+
+    .page-item.active .page-link {
+        background: #4361ee;
+        color: #fff;
+    }
+
+    .page-link:hover {
+        background: #e0e7ff;
+        color: #4361ee;
+    }
+
+    .table > tbody > tr:hover td {
+        background: #f8faff;
+    }
+
+    .filtre-input, .filtre-select {
+        border-radius: 10px !important;
+        border: 1.5px solid #e2e8f0 !important;
+        font-size: .82rem;
+        background: #f8faff;
+    }
+
+        .filtre-input:focus, .filtre-select:focus {
+            border-color: #4361ee !important;
+            box-shadow: 0 0 0 3px rgba(67,97,238,.1) !important;
+            background: #fff;
+        }
+
+    .btn-filtrele {
+        border-radius: 10px !important;
+        background: #4361ee;
+        border: none;
+        font-size: .82rem;
+    }
+
+    .btn-temizle {
+        border-radius: 10px !important;
+        font-size: .82rem;
+        border: 1.5px solid #e2e8f0;
+        color: #64748b;
+    }
+
+        .btn-temizle:hover {
+            background: #f1f5f9;
+        }
+
+    .durum-badge {
+        font-size: .72rem;
+        padding: .3rem .7rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .islem-btn {
+        border-radius: 8px !important;
+        padding: .25rem .5rem;
+        font-size: .78rem;
+    }
+</style>
+
+<!-- Başlık -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Kargo Listesi</h4>
+        <p class="text-muted small mb-0">
+            Toplam <strong style="color:#4361ee">@Model.ToplamKayit.ToString("N0")</strong> kayıt ·
+            Sayfa <strong>@Model.Sayfa</strong> / <strong>@Model.ToplamSayfa</strong>
+        </p>
+    </div>
+    <a href="/Operasyon" class="btn btn-sm px-3 py-2 text-white fw-semibold"
+       style="background:#4361ee;border-radius:12px;border:none">
+        <i class="bi bi-plus-circle me-1"></i>Yeni Kargo
+    </a>
+</div>
+
+<!-- Filtre Paneli -->
+<div class="card filtre-card border-0 shadow-sm mb-3" style="background:linear-gradient(135deg,#f8faff,#fff)">
+    <div class="card-body py-3 px-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center"
+                 style="width:28px;height:28px;background:#e0e7ff">
+                <i class="bi bi-funnel-fill" style="color:#4361ee;font-size:.8rem"></i>
+            </div>
+            <span class="fw-semibold small" style="color:#4361ee">Filtrele & Ara</span>
+        </div>
+        <form method="get">
+            <input type="hidden" name="Sayfa" value="1" />
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <input name="TakipNo" class="form-control form-control-sm filtre-input"
+                           placeholder="🔍 Takip No" value="@Model.TakipNo" />
+                </div>
+                <div class="col-md-2">
+                    <select name="GondericiSehir" class="form-select form-select-sm filtre-select">
+                        <option value="">📍 Gönderici Şehir</option>
+                        @foreach (var s in KargoListeModel.Sehirler)
+                        {
+                            <option value="@s" selected="@(Model.GondericiSehir == s)">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="AliciSehir" class="form-select form-select-sm filtre-select">
+                        <option value="">📍 Alıcı Şehir</option>
+                        @foreach (var s in KargoListeModel.Sehirler)
+                        {
+                            <option value="@s" selected="@(Model.AliciSehir == s)">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="Durum" class="form-select form-select-sm filtre-select">
+                        <option value="">📦 Tüm Durumlar</option>
+                        @foreach (var d in KargoListeModel.Durumlar)
+                        {
+                            <option value="@d" selected="@(Model.Durum == d)">@d</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="KargoFirmasi" class="form-select form-select-sm filtre-select">
+                        <option value="">🏢 Tüm Firmalar</option>
+                        @foreach (var f in KargoListeModel.Firmalar)
+                        {
+                            <option value="@f" selected="@(Model.KargoFirmasi == f)">@f</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="UrunKategorisi" class="form-select form-select-sm filtre-select">
+                        <option value="">🏷️ Tüm Kategoriler</option>
+                        @foreach (var k in KargoListeModel.Kategoriler)
+                        {
+                            <option value="@k" selected="@(Model.UrunKategorisi == k)">@k</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-sm btn-filtrele text-white w-100">
+                        <i class="bi bi-search me-1"></i>Filtrele
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <a href="/KargoListe" class="btn btn-sm btn-temizle w-100">
+                        <i class="bi bi-x-circle me-1"></i>Temizle
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tablo -->
+<div class="card tablo-card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size:.82rem">
+                <thead>
+                    <tr style="background:linear-gradient(135deg,#f0f4ff,#f8faff)">
+                        <th class="ps-4 py-3 text-muted fw-semibold border-0">#</th>
+                        <th class="py-3 fw-semibold border-0">Takip No</th>
+                        <th class="py-3 fw-semibold border-0">Gönderici</th>
+                        <th class="py-3 fw-semibold border-0">Alıcı</th>
+                        <th class="py-3 fw-semibold border-0">Güzergah</th>
+                        <th class="py-3 fw-semibold border-0">Kategori</th>
+                        <th class="py-3 fw-semibold border-0">Firma</th>
+                        <th class="py-3 fw-semibold border-0">Tarih</th>
+                        <th class="py-3 fw-semibold border-0">Tutar</th>
+                        <th class="py-3 fw-semibold border-0">Durum</th>
+                        <th class="py-3 fw-semibold border-0 text-end pe-4">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Kargolar.Any())
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center py-5 text-muted">
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                     style="width:64px;height:64px;background:#f0f4ff">
+                                    <i class="bi bi-inbox fs-3" style="color:#4361ee;opacity:.4"></i>
+                                </div>
+                                <p class="mb-0">Filtreye uygun kayıt bulunamadı.</p>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var k in Model.Kargolar)
+                    {
+                        var (bg, renk) = k.Durum switch
+                        {
+                            "Teslim Edildi" => ("#dcfce7", "#16a34a"),
+                            "Yolda" => ("#e0e7ff", "#4361ee"),
+                            "Depoda" => ("#e0f2fe", "#0284c7"),
+                            "İade" => ("#fef9c3", "#ca8a04"),
+                            "Beklemede" => ("#f1f5f9", "#64748b"),
+                            "Hasar Gördü" => ("#ffe4e6", "#e11d48"),
+                            _ => ("#f1f5f9", "#64748b")
+                        };
+                        <tr>
+                            <td class="ps-4 text-muted">@k.Id</td>
+                            <td>
+                                <span class="fw-bold font-monospace" style="color:#4361ee">@k.TakipNo</span>
+                            </td>
+                            <td class="fw-semibold">@k.GondericiAd</td>
+                            <td class="fw-semibold">@k.AliciAd</td>
+                            <td>
+                                <span class="text-muted">@k.GondericiSehir</span>
+                                <i class="bi bi-arrow-right mx-1" style="color:#cbd5e1;font-size:.7rem"></i>
+                                <span class="fw-semibold">@k.AliciSehir</span>
+                            </td>
+                            <td>
+                                <span class="durum-badge" style="background:#f0f4ff;color:#4361ee">
+                                    @k.UrunKategorisi
+                                </span>
+                            </td>
+                            <td class="text-muted">@k.KargoFirmasi</td>
+                            <td class="text-muted">@k.GonderiTarihi.ToString("dd.MM.yyyy")</td>
+                            <td class="fw-bold" style="color:#0284c7">₺@k.OdemeTutari.ToString("N2")</td>
+                            <td>
+                                <span class="durum-badge" style="background:@bg;color:@renk">
+                                    @k.Durum
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="/Operasyon?id=@k.Id"
+                                   class="btn islem-btn me-1"
+                                   style="background:#fef9c3;color:#ca8a04;border:none"
+                                   title="Düzenle">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn islem-btn"
+                                        style="background:#ffe4e6;color:#e11d48;border:none"
+                                        onclick="silOnay(@k.Id, '@k.TakipNo')"
+                                        title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Sayfalama -->
+@if (Model.ToplamSayfa > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+            @if (Model.Sayfa > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?Sayfa=1&TakipNo=@Model.TakipNo&GondericiSehir=@Model.GondericiSehir&AliciSehir=@Model.AliciSehir&Durum=@Model.Durum&KargoFirmasi=@Model.KargoFirmasi&UrunKategorisi=@Model.UrunKategorisi">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?Sayfa=@(Model.Sayfa - 1)&TakipNo=@Model.TakipNo&GondericiSehir=@Model.GondericiSehir&AliciSehir=@Model.AliciSehir&Durum=@Model.Durum&KargoFirmasi=@Model.KargoFirmasi&UrunKategorisi=@Model.UrunKategorisi">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            }
+            @{
+                int start = Math.Max(1, Model.Sayfa - 3);
+                int end = Math.Min(Model.ToplamSayfa, Model.Sayfa + 3);
+            }
+            @for (int i = start; i <= end; i++)
+            {
+                <li class="page-item @(i == Model.Sayfa ? "active" : "")">
+                    <a class="page-link" href="?Sayfa=@i&TakipNo=@Model.TakipNo&GondericiSehir=@Model.GondericiSehir&AliciSehir=@Model.AliciSehir&Durum=@Model.Durum&KargoFirmasi=@Model.KargoFirmasi&UrunKategorisi=@Model.UrunKategorisi">@i</a>
+                </li>
+            }
+            @if (Model.Sayfa < Model.ToplamSayfa)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?Sayfa=@(Model.Sayfa + 1)&TakipNo=@Model.TakipNo&GondericiSehir=@Model.GondericiSehir&AliciSehir=@Model.AliciSehir&Durum=@Model.Durum&KargoFirmasi=@Model.KargoFirmasi&UrunKategorisi=@Model.UrunKategorisi">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?Sayfa=@Model.ToplamSayfa&TakipNo=@Model.TakipNo&GondericiSehir=@Model.GondericiSehir&AliciSehir=@Model.AliciSehir&Durum=@Model.Durum&KargoFirmasi=@Model.KargoFirmasi&UrunKategorisi=@Model.UrunKategorisi">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+        <p class="text-center text-muted small mt-2">
+            @((Model.Sayfa - 1) * 12 + 1) – @(Math.Min(Model.Sayfa * 12, Model.ToplamKayit))
+            / @Model.ToplamKayit.ToString("N0") kayıt
+        </p>
+    </nav>
+}
+
+<!-- Silme Modal -->
+<div class="modal fade" id="silModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content border-0 shadow" style="border-radius:20px">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center"
+                         style="width:32px;height:32px;background:#ffe4e6">
+                        <i class="bi bi-exclamation-triangle" style="color:#e11d48;font-size:.9rem"></i>
+                    </div>
+                    <h6 class="modal-title fw-bold mb-0" style="color:#e11d48">Silme Onayı</h6>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p class="small mb-1 text-muted">Şu kaydı silmek istiyor musunuz?</p>
+                <p class="fw-bold mb-2" style="color:#4361ee" id="silTakipNo"></p>
+                <div class="rounded-3 p-2" style="background:#ffe4e6">
+                    <p class="small mb-0 fw-semibold" style="color:#e11d48">
+                        <i class="bi bi-info-circle me-1"></i>Bu işlem geri alınamaz!
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-sm px-3"
+                        style="border-radius:10px;background:#f1f5f9;border:none;color:#64748b"
+                        data-bs-dismiss="modal">
+                    İptal
+                </button>
+                <form method="post" asp-page-handler="Sil" class="d-inline">
+                    <input type="hidden" name="id" id="silModalId" />
+                    <button type="submit" class="btn btn-sm px-3"
+                            style="border-radius:10px;background:#e11d48;border:none;color:#fff">
+                        <i class="bi bi-trash me-1"></i>Evet, Sil
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function silOnay(id, takipNo) {
+            document.getElementById('silTakipNo').textContent = takipNo;
+            document.getElementById('silModalId').value = id;
+            new bootstrap.Modal(document.getElementById('silModal')).show();
+        }
+    </script>
+}

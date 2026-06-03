@@ -1,0 +1,280 @@
+﻿@page
+@model DapperLojistik.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Yönetici Dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+}
+
+<style>
+    .stat-card {
+        border-radius: 20px !important;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.08) !important;
+    }
+    .stat-icon {
+        width: 56px; height: 56px;
+        border-radius: 16px;
+    }
+    .chart-card {
+        border-radius: 20px !important;
+    }
+    .section-badge {
+        font-size: .7rem;
+        padding: .3rem .8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        letter-spacing: .04em;
+    }
+</style>
+
+<!-- Üst Başlık -->
+<div class="mb-4">
+    <h4 class="fw-bold mb-1">Merhaba 👋</h4>
+    <p class="text-muted small mb-0">İşte bugünkü kargo operasyon özetiniz.</p>
+</div>
+
+<!-- Özet Kartlar -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#eef2ff,#fff)">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#e0e7ff">
+                    <i class="bi bi-box-seam fs-4" style="color:#4361ee"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Toplam Gönderi</div>
+                    <div class="fs-3 fw-bold" style="color:#4361ee">@Model.ToplamGonderi.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#f0fdf4,#fff)">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#dcfce7">
+                    <i class="bi bi-check-circle fs-4" style="color:#16a34a"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Teslim Edilen</div>
+                    <div class="fs-3 fw-bold" style="color:#16a34a">@Model.TeslimEdilen.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#fffbeb,#fff)">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#fef9c3">
+                    <i class="bi bi-truck fs-4" style="color:#ca8a04"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Yolda</div>
+                    <div class="fs-3 fw-bold" style="color:#ca8a04">@Model.Yolda.ToString("N0")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100" style="background:linear-gradient(135deg,#f0f9ff,#fff)">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon d-flex align-items-center justify-content-center" style="background:#e0f2fe">
+                    <i class="bi bi-wallet2 fs-4" style="color:#0284c7"></i>
+                </div>
+                <div>
+                    <div class="text-muted small mb-1">Toplam Ciro</div>
+                    <div class="fs-5 fw-bold" style="color:#0284c7">₺@Model.ToplamCiro.ToString("N0")</div>
+                    <div class="text-muted" style="font-size:.75rem">Ort. ₺@Model.OrtalamaUcret.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafikler -->
+<div class="row g-4 mb-4">
+    <!-- Aylık Trend -->
+    <div class="col-xl-6">
+        <div class="card chart-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="fw-bold mb-0">Son 12 Ay Gönderi Trendi</h6>
+                    <p class="text-muted small mb-0">Aylık gönderi adetleri</p>
+                </div>
+                <span class="section-badge" style="background:#e0e7ff;color:#4361ee">
+                    <i class="bi bi-graph-up me-1"></i>Trend
+                </span>
+            </div>
+            <div class="card-body px-4 pb-3">
+                <canvas id="trendChart" height="110"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Durum Dağılımı -->
+    <div class="col-xl-6">
+        <div class="card chart-card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="fw-bold mb-0">Durum Dağılımı</h6>
+                    <p class="text-muted small mb-0">Kargo durumları</p>
+                </div>
+                <span class="section-badge" style="background:#dcfce7;color:#16a34a">
+                    <i class="bi bi-pie-chart me-1"></i>Dağılım
+                </span>
+            </div>
+            <div class="card-body px-3 pb-3">
+                <div class="row g-2">
+                    @{
+                        var durumRenkler = new[] {
+                                        ("#e0e7ff","#4361ee"),
+                                        ("#dcfce7","#16a34a"),
+                                        ("#fef9c3","#ca8a04"),
+                                        ("#ffe4e6","#e11d48"),
+                                        ("#ede9fe","#7c3aed"),
+                                        ("#e0f2fe","#0284c7")
+                                        };
+                        var durumIkonlar = new[] {
+                                        "bi-check-circle","bi-truck","bi-building",
+                                        "bi-arrow-return-left","bi-clock","bi-exclamation-triangle"
+                                        };
+                    }
+                    @for (int i = 0; i < Model.DurumLabels.Count; i++)
+                    {
+                        var (bg, renk) = durumRenkler[i % durumRenkler.Length];
+                        var ikon = durumIkonlar[i % durumIkonlar.Length];
+                        var yuzde = Model.DurumData.Sum() > 0
+                        ? (double)Model.DurumData[i] / Model.DurumData.Sum() * 100
+                        : 0;
+                        <div class="col-4">
+                            <div class="rounded-4 p-3 h-100" style="background:@bg">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi @ikon" style="color:@renk;font-size:.9rem"></i>
+                                    <span class="small fw-semibold" style="color:@renk;font-size:.75rem">@Model.DurumLabels[i]</span>
+                                </div>
+                                <div class="fw-bold fs-6" style="color:@renk">
+                                    @Model.DurumData[i].ToString("N0")
+                                </div>
+                                <div class="mt-2" style="height:4px;background:rgba(0,0,0,.08);border-radius:10px">
+                                    <div style="height:4px;width:@yuzde.ToString("F0")%;background:@renk;border-radius:10px"></div>
+                                </div>
+                                <div class="small mt-1" style="color:@renk;opacity:.7;font-size:.7rem">%@yuzde.ToString("F1")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top 5 Şehir -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card chart-card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="fw-bold mb-0">Top 5 Gönderici Şehir</h6>
+                    <p class="text-muted small mb-0">En çok gönderi yapılan şehirler</p>
+                </div>
+                <span class="section-badge" style="background:#fef9c3;color:#ca8a04">
+                    <i class="bi bi-geo-alt me-1"></i>Şehirler
+                </span>
+            </div>
+            <div class="card-body px-4">
+                <canvas id="sehirChart" height="55"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const COLORS = ['#4361ee','#16a34a','#ca8a04','#e11d48','#0284c7','#7c3aed'];
+        const PASTEL  = ['#e0e7ff','#dcfce7','#fef9c3','#ffe4e6','#e0f2fe','#ede9fe'];
+
+        // Aylık Trend
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AyLabels)),
+                datasets: [{
+                    label: 'Gönderi Sayısı',
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AyData)),
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67,97,238,0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#4361ee',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,.04)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+
+        // Durum Pasta
+        new Chart(document.getElementById('durumChart'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DurumLabels)),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DurumData)),
+                    backgroundColor: COLORS,
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Şehir Bar
+        new Chart(document.getElementById('sehirChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SehirLabels)),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SehirData)),
+                    backgroundColor: PASTEL,
+                    borderColor: COLORS,
+                    borderWidth: 2,
+                    borderRadius: 10,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,.04)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    </script>
+}
