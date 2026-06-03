@@ -35,3 +35,12 @@ Projenin mimarisinde kararlılık, hız ve modern arayüz standartları ön plan
 1 Milyon satır gibi büyük veri setlerinde geleneksel yöntemler yavaşlamaya sebep olacağı için projede şu performans teknikleri uygulanmıştır:
 * **Server-Side Processing:** Filtreleme (`WHERE`) ve sayfalama (`OFFSET-FETCH`) işlemleri tamamen SQL Server üzerinde çalıştırılarak web sunucusuna sadece ihtiyaç duyulan 12 satırlık verinin gelmesi sağlanmıştır.
 * **Dapper Hafifliği:** Entity Framework gibi ağır kurumsal araçlar yerine, direkt ham SQL gücünü kullanan Dapper tercih edilerek milisaniyeler seviyesinde veri listeleme başarısı yakalanmıştır.
+
+## Görseller
+<img width="1892" height="928" alt="Ekran görüntüsü 2026-06-03 230845" src="https://github.com/user-attachments/assets/0badc622-968d-49d3-b19d-4877811d3c8a" />
+
+<img width="1886" height="934" alt="Ekran görüntüsü 2026-06-03 230905" src="https://github.com/user-attachments/assets/697780cb-e044-42bd-a5cd-7d237ac04347" />
+
+<img width="1908" height="683" alt="Ekran görüntüsü 2026-06-03 231018" src="https://github.com/user-attachments/assets/857f6099-0159-497e-ada5-05ce4cce59ce" />
+
+<img width="1864" height="914" alt="Ekran görüntüsü 2026-06-03 230921" src="https://github.com/user-attachments/assets/5bd63f6e-b5ff-4d90-8b12-32315cfa9321" />
