@@ -43,4 +43,5 @@ Projenin mimarisinde kararlılık, hız ve modern arayüz standartları ön plan
 
 <img width="1908" height="683" alt="Ekran görüntüsü 2026-06-03 231018" src="https://github.com/user-attachments/assets/857f6099-0159-497e-ada5-05ce4cce59ce" />
 
-<img width="1864" height="914" alt="Ekran görüntüsü 2026-06-03 230921" src="https://github.com/user-attachments/assets/5bd63f6e-b5ff-4d90-8b12-32315cfa9321" />
+<img width="1893" height="929" alt="Ekran görüntüsü 2026-06-04 144950" src="https://github.com/user-attachments/assets/53e7e0dd-b423-41f8-95b9-2fe41ec20a23" />
+
